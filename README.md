@@ -2,10 +2,7 @@
 ---
 ###Action Recognition
 ---
-Using UCF-101 database
-
-
-
+Using UCF-101 Database
 
  
 [![Build Status](https://travis-ci.org/BVLC/caffe.svg?branch=master)](https://travis-ci.org/BVLC/caffe)
