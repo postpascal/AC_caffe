@@ -15,6 +15,8 @@ TODO:
 - batch up image filenames as well: don't want to load all of them into memory
 - come up with a batching scheme that preserved order / keeps a unique ID
 """
+import sys
+sys.path.append('/home/cvipgpu/glas/')
 import numpy as np
 import pandas as pd
 import os
@@ -46,7 +48,7 @@ def main(argv):
     parser.add_argument(
         "--model_def",
         default=os.path.join(pycaffe_dir,
-                "../models/bvlc_reference_caffenet/deploy.prototxt"),
+                "../models/bvlc_reference_caffenet/deploy.prototxt.prototxt"),
         help="Model definition file."
     )
     parser.add_argument(
@@ -94,7 +96,7 @@ def main(argv):
     parser.add_argument(
         "--context_pad",
         type=int,
-        default='16',
+        default='32',
         help="Amount of surrounding context to collect in input window."
     )
     args = parser.parse_args()

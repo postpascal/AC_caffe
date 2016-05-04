@@ -14,43 +14,53 @@ def read_avi(avi_path):
 	length=int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
 	length=(length-length%F)/F
 	length=length-2
-#	sample=sample+length-2
-	video=np.zeros((length,F*6,240,320),dtype=np.uint8)
+	
+#	sample=sample+length
+	video=np.zeros((length,F*5,240,320),dtype=np.uint8)
 
 	ret,img = cap.read()
+
 	#img=cv2.resize(img,(320,240))
-	pre_frames=img
+	op_pre_frames=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	for i in range(length):
 		m=0
 		for s in range(F):
-			ret,img = cap.read()
-			#img=cv2.resize(img,(240,240))
 
-			diff_frames=img-pre_frames
+			ret,img = cap.read()
+		#	print rand_list[poi]
+
+			
+		#	print np.shape(img)
+		#	print poi
+			op_next_frames=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+			flow = cv2.calcOpticalFlowFarneback(op_pre_frames,op_next_frames,0.5,1, 3, 15, 3, 5, 1)
+			fx=cv2.normalize(flow[...,0],None,0,255,cv2.NORM_MINMAX)
+			fy=cv2.normalize(flow[...,1],None,0,255,cv2.NORM_MINMAX)
+			#RGB channels
 			video[i,m]=img[:,:,0]
 			m=m+1
 			video[i,m]=img[:,:,1]
 			m=m+1
 			video[i,m]=img[:,:,2]
 			m=m+1
-			video[i,m]=diff_frames[:,:,0]
+			# three  difference channels
+			#optical flow channels
+			video[i,m]=fx
 			m=m+1
-			video[i,m]=diff_frames[:,:,1]
+			video[i,m]=fy
 			m=m+1
-			video[i,m]=diff_frames[:,:,2]
-			m=m+1
-			pre_frames=img
+			op_pre_frames=op_next_frames
 	cap.release()
 	return video
 
 #main function start here
 if __name__ == '__main__':
 	N=313
-	F=3
-#	sample=0
-#ddN=350
+	F=2
+	#sample=0
+#N=350
 	n=0
-	sample=13527
+	sample=20673
 	y = []
 	a=range(sample)
 	random.shuffle(a)
@@ -77,7 +87,6 @@ if __name__ == '__main__':
 		#print full_path[i]
 		X=read_avi(video_path)
 		#print sample
-		
 		t=X.shape[0]
 		#print t
 		for p in range(t):

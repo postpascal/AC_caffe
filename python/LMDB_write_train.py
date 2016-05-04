@@ -14,7 +14,6 @@ def read_avi(avi_path):
 	length=int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
 	length=(length-length%F)/F
 	length=length-2
-#	sample=sample+length-2
 	video=np.zeros((length,F*6,240,320),dtype=np.uint8)
 
 	ret,img = cap.read()
@@ -45,18 +44,18 @@ def read_avi(avi_path):
 
 #main function start here
 if __name__ == '__main__':
-	N=313
+	N=993
 	F=3
 #	sample=0
 #ddN=350
 	n=0
-	sample=13527
+	sample=38479
 	y = []
 	a=range(sample)
 	random.shuffle(a)
 	full_path=[]
 	cou=0
-	text_file=open("Ac_test_name.txt")
+	text_file=open("Ac_train_name.txt")
 	line=text_file.readlines()
 	for i in line:
 		path=str(i.rsplit(' ',1)[0])
@@ -71,7 +70,7 @@ if __name__ == '__main__':
 
 
 
-	env = lmdb.open('/home/keke/AC_caffe/Acre/Acre_test_lmdb',map_size = 1024**4,map_async=True,max_dbs=0)
+	env = lmdb.open('/home/keke/AC_caffe/Acre/Acre_train_lmdb',map_size = 1024**4,map_async=True,max_dbs=0)
 	for i in range(N):
 		video_path=full_path[i]#get videos' full path
 		#print full_path[i]

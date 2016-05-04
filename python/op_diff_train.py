@@ -12,51 +12,80 @@ def read_avi(avi_path):
 	print avi_path
 	cap = cv2.VideoCapture(avi_path)
 	length=int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
-	length=(length-length%F)/F
-	length=length-2
-#	sample=sample+length-2
-	video=np.zeros((length,F*6,240,320),dtype=np.uint8)
+	print length
+	if length<54:
+		print "length is less than 50" 
+		rand_list=range(length)
+	else:
+		rand_list=random.sample(range(1,length-1),50)
+		rand_list.sort()
+		length=50
 
+	length=(length-length%F)/F
+	print rand_list
+	
+#	sample=sample+length
+	video=np.zeros((length,F*8,240,320),dtype=np.uint8)
+	poi=0
+	cap.set(1,0)
 	ret,img = cap.read()
+
 	#img=cv2.resize(img,(320,240))
+	op_pre_frames=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	pre_frames=img
 	for i in range(length):
 		m=0
 		for s in range(F):
+			cap.set(1,rand_list[poi])
 			ret,img = cap.read()
-			#img=cv2.resize(img,(240,240))
-
+		#	print rand_list[poi]
+			poi=poi+1
+			
+		#	print np.shape(img)
+		#	print poi
+			op_next_frames=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+			flow = cv2.calcOpticalFlowFarneback(op_pre_frames,op_next_frames,0.5,1, 3, 15, 3, 5, 1)
+			fx=cv2.normalize(flow[...,0],None,0,255,cv2.NORM_MINMAX)
+			fy=cv2.normalize(flow[...,1],None,0,255,cv2.NORM_MINMAX)
 			diff_frames=img-pre_frames
+			#RGB channels
 			video[i,m]=img[:,:,0]
 			m=m+1
 			video[i,m]=img[:,:,1]
 			m=m+1
 			video[i,m]=img[:,:,2]
 			m=m+1
+			# three  difference channels
 			video[i,m]=diff_frames[:,:,0]
 			m=m+1
 			video[i,m]=diff_frames[:,:,1]
 			m=m+1
 			video[i,m]=diff_frames[:,:,2]
 			m=m+1
+			#optical flow channels
+			video[i,m]=fx
+			m=m+1
+			video[i,m]=fy
+			m=m+1
 			pre_frames=img
+			op_pre_frames=op_next_frames
 	cap.release()
 	return video
 
 #main function start here
 if __name__ == '__main__':
-	N=313
-	F=3
-#	sample=0
-#ddN=350
+	N=995
+	F=5
+	#sample=0
+#N=350
 	n=0
-	sample=13527
+	sample=9948
 	y = []
 	a=range(sample)
 	random.shuffle(a)
 	full_path=[]
 	cou=0
-	text_file=open("Ac_test_name.txt")
+	text_file=open("Ac_train_name.txt")
 	line=text_file.readlines()
 	for i in line:
 		path=str(i.rsplit(' ',1)[0])
@@ -71,13 +100,12 @@ if __name__ == '__main__':
 
 
 
-	env = lmdb.open('/home/keke/AC_caffe/Acre/Acre_test_lmdb',map_size = 1024**4,map_async=True,max_dbs=0)
+	env = lmdb.open('/home/keke/AC_caffe/Acre/Acre_train_lmdb',map_size = 1024**4,map_async=True,max_dbs=0)
 	for i in range(N):
 		video_path=full_path[i]#get videos' full path
 		#print full_path[i]
 		X=read_avi(video_path)
 		#print sample
-		
 		t=X.shape[0]
 		#print t
 		for p in range(t):
